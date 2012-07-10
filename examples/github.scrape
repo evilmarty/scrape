@@ -1,0 +1,7 @@
+site "https://github.com/explore"
+
+match "explore" do |doc|
+  doc.css('ol.ranked-repositories li h3').each do |node|
+    puts node.inner_text.strip
+  end
+end

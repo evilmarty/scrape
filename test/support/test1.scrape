@@ -1,0 +1,5 @@
+site "http://example.com"
+
+match "test" do |doc|
+  "boo!"
+end

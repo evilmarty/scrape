@@ -1,0 +1,5 @@
+site "http://www.google.com/search?q=cats"
+
+match "/search" do |doc|
+  puts "Page title: #{doc.css('title').inner_text}"
+end
