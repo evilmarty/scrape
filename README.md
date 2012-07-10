@@ -1,6 +1,6 @@
 # Scrape
 
-The really simple web scraper.
+A really simple web scraper.
 
 ```ruby
 site "https://github.com/explore" # The site to scrape. Will be used as the base address.
