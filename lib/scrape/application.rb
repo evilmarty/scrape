@@ -30,7 +30,7 @@ class Scrape::Application
 
   def reset
     @history = []
-    @queue = sites.values.map{|site| site.url.to_s }
+    @queue = sites.values.map{|site| site.to_s }
   end
 
   def queue
@@ -44,7 +44,7 @@ class Scrape::Application
   end
 
   def [] url
-    @sites.values.detect{|site| site.url < url }
+    @sites.values.detect{|site| site.accept? url }
   end
 
   def load_scrapefile

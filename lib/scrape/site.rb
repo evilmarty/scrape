@@ -1,10 +1,11 @@
+require 'uri'
 require 'nokogiri'
 
 class Scrape::Site
   attr_reader :url, :matches
 
   def initialize url
-    @url = Scrape::URI.new url
+    @url = URI.parse url
     @url.query = nil
     @url.fragment = nil
     @matches = []
@@ -17,15 +18,27 @@ class Scrape::Site
   end
 
   def parse url
-    url = self.url + url
-    doc = Nokogiri::HTML url.open
+    url = normalize url
+    doc = Nokogiri::HTML Scrape.open(url)
 
     @matches.each{|match| match.invoke doc if match =~ url }
 
-    urls = doc.css("a[href]").map do |node|
-      href = self.url + node['href']
-      self.url < href ? href : nil
+    doc.css("a[href]").map{|node| normalize node['href'] }.select{|url| accept? url }
+  end
+
+  def accept? url
+    url.to_s[0, to_s.length] == to_s
+  end
+
+  def normalize url
+    case url
+    when /^.+:\/\// then url.dup
+    when /^\//      then @url.merge(url).to_s
+    else @url.merge("#{@url.path}/#{url}").to_s
     end
-    urls.compact
+  end
+
+  def to_s
+    url.to_s
   end
 end

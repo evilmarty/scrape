@@ -1,5 +1,6 @@
 require "rubygems"
 require "logger"
+require "open-uri"
 require "bundler/setup"
 
 module Scrape
@@ -31,6 +32,11 @@ module Scrape
 
     def load_scrapefile path
       Application.new path
+    end
+
+    def open url, headers = {}, &block
+      headers = {"User-Agent" => user_agent}.merge(headers)
+      super(url, headers, &block).read
     end
   end
 end
