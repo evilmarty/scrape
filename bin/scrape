@@ -2,7 +2,6 @@
 
 $: << File.expand_path('../../lib', __FILE__)
 
-require "scrape"
 require "scrape/cli"
 
-Scrape::CLI.new(File.basename($0)).run(ARGV)
+Scrape::CLI.new(File.basename($0), ARGV).run
