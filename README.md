@@ -36,9 +36,20 @@ Simply install the gem
 gem install scrape
 ```
 
+or you can download the source by cloning the repository
+
+```
+git clone https://github.com/evilmarty/scrape.git
+```
+
+## Contribute
+
+Please fork the repository and make a pull request on Github.
+
+If you discover an issue please [lodge it](https://github.com/evilmarty/scrape/issues).
+
 ## TODO
 
 * Fix bugs
-* Add support for Robots.txt
 * Depth limiting
 * Better docs
