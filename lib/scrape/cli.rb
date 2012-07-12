@@ -28,12 +28,11 @@ class Scrape::CLI
     end
     opts.parse argv
 
-    if File.exists? options[:file]
-      Scrape::Application.new(options[:file]).run
-    else
-      puts "#{command} aborted!"
-      puts "No Scrapefile found"
-      exit -1
-    end
+    Scrape::Application.new(options.delete(:file), options).run
+
+  rescue Scrape::FileNotFound
+    puts "#{command} aborted!"
+    puts "No Scrapefile found"
+    exit -1
   end
 end

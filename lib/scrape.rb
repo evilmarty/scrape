@@ -13,7 +13,7 @@ module Scrape
   autoload 'DSL', 'scrape/dsl'
   autoload 'URI', 'scrape/uri'
 
-  class ScrapeFileNotFound < Exception; end
+  class FileNotFound < Exception; end
 
   class << self
     attr_writer :user_agent

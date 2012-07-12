@@ -54,7 +54,7 @@ class ApplicationTest < Scrape::TestCase
     filepath = File.join(SUPPORT_FILES, 'test1.scrape')
     test_loader = MiniTest::Mock.new
     test_loader.expect :load, nil, [filepath]
-    Scrape::Application.new(filepath, test_loader).run
+    Scrape::Application.new(filepath, {}, test_loader).run
     assert test_loader.verify, "loader did not receive file"
   end
 

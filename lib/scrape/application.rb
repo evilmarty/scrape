@@ -1,7 +1,7 @@
 class Scrape::Application
   attr_reader :scrapefile, :loader, :sites, :history
 
-  def initialize scrapefile, loader = Scrape::DefaultLoader.new
+  def initialize scrapefile, options = {}, loader = Scrape::DefaultLoader.new
     @scrapefile = File.expand_path scrapefile
     @loader = loader
     @sites = {}
@@ -49,7 +49,8 @@ class Scrape::Application
 
   def load_scrapefile
     return if @scrapefile_loaded
-    result = loader.load(scrapefile)
+    raise Scrape::FileNotFound.new(scrapefile) unless File.exists? scrapefile
+    result = loader.load scrapefile
     @sites.update result if result.is_a? Hash
     reset
     @scrapefile_loaded = true
