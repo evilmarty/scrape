@@ -82,6 +82,27 @@ class SiteTest < Scrape::TestCase
     site = Scrape::Site.new "http://www.example.com/foo"
     refute site.accept?("http://www.example.com/bar")
   end
+
+  test "#accept? should return true when specified url is inside the site's url and allowed by robots.txt" do
+    stub_request(:get, "http://www.example.com/robots.txt").
+      to_return(:status => 200, :body => <<-TXT)
+      User-agent: #{Scrape.user_agent}
+      Disallow: /bar
+      TXT
+
+    site = Scrape::Site.new "http://www.example.com/foo", :ignore_robots_txt => false
+    assert site.accept?("http://www.example.com/foo/bar")
+  end
+
+  test "#accept? should return false when specified url is inside the site's url and disallowed by robots.txt" do
+    stub_request(:get, "http://www.example.com/robots.txt").
+      to_return(:status => 200, :body => <<-TXT)
+      User-agent: #{Scrape.user_agent}
+      Disallow: /foo
+      TXT
+
+    site = Scrape::Site.new "http://www.example.com/foo", :ignore_robots_txt => false
+    refute site.accept?("http://www.example.com/foo/bar"), "URL should not be accepted"
   end
 
   test "#normalize should return a url when string begins with a slash" do
@@ -102,5 +123,17 @@ class SiteTest < Scrape::TestCase
   test "#normalize should return a url when string is a forward slash" do
     site = Scrape::Site.new "http://www.example.com/foo"
     assert_equal "http://www.example.com/", site.normalize("/")
+  end
+
+  test "#robots_txt should return a RobotsTxt instance from the site's url" do
+    stub_request(:get, "http://www.example.com/robots.txt").
+      to_return(:status => 200, :body => <<-TXT)
+      User-agent: Test
+      Disallow: /foo
+      TXT
+
+    site = Scrape::Site.new "http://www.example.com/foo"
+    robots = site.robots_txt
+    assert_kind_of Scrape::RobotsTxt, robots
   end
 end

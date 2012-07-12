@@ -69,4 +69,13 @@ class ApplicationTest < Scrape::TestCase
     3.times{ app.enqueue "http://example.com" }
     assert_equal ["http://example.com"], app.queue
   end
+
+  test "#ignore_robots_txt should update #ignore_robots_txt on all sites" do
+    site = Scrape::Site.new "http://www.example.com", :ignore_robots_txt => false
+    app = Scrape::Application.new(".")
+    app.sites.update site.to_s => site
+    assert_equal false, site.ignore_robots_txt
+    app.ignore_robots_txt = true
+    assert_equal true, site.ignore_robots_txt
+  end
 end

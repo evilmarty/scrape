@@ -3,6 +3,8 @@ require "logger"
 require "open-uri"
 require "bundler/setup"
 
+require "scrape/string_ext.rb"
+
 module Scrape
   require 'scrape/version'
 
@@ -11,7 +13,8 @@ module Scrape
   autoload 'Match', 'scrape/match'
   autoload 'DefaultLoader', 'scrape/default_loader'
   autoload 'DSL', 'scrape/dsl'
-  autoload 'URI', 'scrape/uri'
+  autoload 'RobotsTxt', 'scrape/robots_txt'
+  autoload 'RobotsTxtRules', 'scrape/robots_txt_rules'
 
   class FileNotFound < Exception; end
 

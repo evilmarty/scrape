@@ -17,6 +17,9 @@ class Scrape::CLI
       opts.on "-f", "--scrapefile [FILE]", "Use FILE as scrapefile" do |file|
         options[:file] = File.expand_path file
       end
+      opts.on "-i", "--ignore-robots-txt", "Ignore robots.txt" do
+        options[:ignore_robots_txt] = true
+      end
       opts.on_tail "-h", "--help", "Show this message" do
         puts opts
         exit

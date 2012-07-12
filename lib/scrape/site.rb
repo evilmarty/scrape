@@ -1,16 +1,16 @@
-require 'uri'
 require 'addressable/uri'
 require 'nokogiri'
 
 class Scrape::Site
   attr_reader :url, :matches
+  attr_accessor :ignore_robots_txt
 
-  def initialize url
-    @url = URI.parse url
+  def initialize url, options = {}
     @url = Addressable::URI.parse url
     @url.query = nil
     @url.fragment = nil
     @matches = []
+    @ignore_robots_txt = options.fetch(:ignore_robots_txt){ true }
   end
 
   def add_match matcher, &proc
@@ -25,26 +25,33 @@ class Scrape::Site
 
     @matches.each{|match| match.invoke doc if match =~ url }
 
-    doc.css("a[href]").map{|node| normalize node['href'] }.select{|url| accept? url }
     doc.css("a[href]").map{|node| normalize node['href'], url }.select{|url| accept? url }
   end
 
   def accept? url
-    url.to_s[0, to_s.length] == to_s
+    url = normalize url
+    url.starts_with(to_s) && !disallowed?(url)
+  end
+
   def normalize url, base_url = self.url
     Addressable::URI.join(base_url, url).to_s
   end
+
+  def robots_txt
+    @robots_txt ||= Scrape::RobotsTxt.load url
   end
 
-  def normalize url
-    case url
-    when /^.+:\/\// then url.dup
-    when /^\//      then @url.merge(url).to_s
-    else @url.merge("#{@url.path}/#{url}").to_s
-    end
+  def ignore_robots_txt?
+    !!@ignore_robots_txt
   end
 
   def to_s
     url.to_s
+  end
+
+private
+
+  def disallowed? url
+    !ignore_robots_txt? && robots_txt =~ Addressable::URI.parse(url).path
   end
 end
