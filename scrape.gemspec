@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_development_dependency "nokogiri", "~> 1.5.5"
+  s.add_development_dependency "addressable", "~> 2.2.8"
 end

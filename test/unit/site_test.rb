@@ -24,8 +24,8 @@ class SiteTest < Scrape::TestCase
     assert_equal ["http://www.example.com/link1.html"], site.parse("/test")
   end
 
-  test "#parse should return relative urls to the site" do
-    stub_request(:get, "http://www.example.com/test").
+  test "#parse should return relative urls to the specified url" do
+    stub_request(:get, "http://www.example.com/foo/bar").
       with(:headers => {"User-Agent" => Scrape.user_agent}).
       to_return(:status => 200, :body => <<-HTML)
       <html>
@@ -36,7 +36,7 @@ class SiteTest < Scrape::TestCase
     HTML
 
     site = Scrape::Site.new "http://www.example.com"
-    assert_equal ["http://www.example.com/link1.html"], site.parse("/test")
+    assert_equal ["http://www.example.com/foo/link1.html"], site.parse("/foo/bar")
   end
 
   test "#parse should return no urls" do
@@ -73,9 +73,15 @@ class SiteTest < Scrape::TestCase
     assert ok, "Match was not invoked"
   end
 
-  test "#accept? should return true when specified url inside the site's url" do
-    uri = Scrape::Site.new "http://www.example.com/foo"
-    assert uri.accept?("http://www.example.com/foo/bar")
+  test "#accept? should return true when specified url is inside the site's url" do
+    site = Scrape::Site.new "http://www.example.com/foo"
+    assert site.accept?("http://www.example.com/foo/bar")
+  end
+
+  test "#accept? should return false when specified url is outside the site's url" do
+    site = Scrape::Site.new "http://www.example.com/foo"
+    refute site.accept?("http://www.example.com/bar")
+  end
   end
 
   test "#normalize should return a url when string begins with a slash" do
@@ -84,12 +90,17 @@ class SiteTest < Scrape::TestCase
   end
 
   test "#normalize should return a url with the string appended" do
-    site = Scrape::Site.new "http://www.example.com/foo"
+    site = Scrape::Site.new "http://www.example.com/foo/boo"
     assert_equal "http://www.example.com/foo/bar", site.normalize("bar")
   end
 
   test "#normalize should return the string when it begins with a scheme" do
     site = Scrape::Site.new "http://www.example.com/foo"
     assert_equal "http://www.example.org/bar", site.normalize("http://www.example.org/bar")
+  end
+
+  test "#normalize should return a url when string is a forward slash" do
+    site = Scrape::Site.new "http://www.example.com/foo"
+    assert_equal "http://www.example.com/", site.normalize("/")
   end
 end

@@ -1,4 +1,5 @@
 require 'uri'
+require 'addressable/uri'
 require 'nokogiri'
 
 class Scrape::Site
@@ -6,6 +7,7 @@ class Scrape::Site
 
   def initialize url
     @url = URI.parse url
+    @url = Addressable::URI.parse url
     @url.query = nil
     @url.fragment = nil
     @matches = []
@@ -24,10 +26,14 @@ class Scrape::Site
     @matches.each{|match| match.invoke doc if match =~ url }
 
     doc.css("a[href]").map{|node| normalize node['href'] }.select{|url| accept? url }
+    doc.css("a[href]").map{|node| normalize node['href'], url }.select{|url| accept? url }
   end
 
   def accept? url
     url.to_s[0, to_s.length] == to_s
+  def normalize url, base_url = self.url
+    Addressable::URI.join(base_url, url).to_s
+  end
   end
 
   def normalize url

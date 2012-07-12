@@ -17,6 +17,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable (~> 2.2.8)
   nokogiri (~> 1.5.5)
   scrape!
   webmock (~> 1.8.7)
