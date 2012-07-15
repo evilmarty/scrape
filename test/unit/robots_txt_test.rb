@@ -68,4 +68,12 @@ class RobotsTxtTest < Scrape::TestCase
     assert_equal ["Test"], robots.user_agents
     assert_equal ["/foo", "/bar"], robots.disallows
   end
+
+  test ".load should return nil when specified url results in 404" do
+    stub_request(:get, "http://www.example.com/robots.txt").
+      to_return(:status => 404, :body => "")
+
+    robots = Scrape::RobotsTxt.load "http://www.example.com/foo"
+    assert_nil robots
+  end
 end

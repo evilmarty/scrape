@@ -38,7 +38,7 @@ class Scrape::Site
   end
 
   def robots_txt
-    @robots_txt ||= Scrape::RobotsTxt.load url
+    @robots_txt = Scrape::RobotsTxt.load url unless defined? @robots_txt
   end
 
   def ignore_robots_txt?

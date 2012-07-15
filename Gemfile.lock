@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scrape (0.2.3)
+    scrape (0.2.4)
 
 GEM
   remote: http://rubygems.org/

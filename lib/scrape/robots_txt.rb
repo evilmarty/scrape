@@ -49,6 +49,8 @@ class Scrape::RobotsTxt
   def self.load url, default = true
     url = Addressable::URI.join(url, "/robots.txt") if default
     parse Scrape.open(url)
+  rescue OpenURI::HTTPError
+    nil
   end
   public :load
 end
