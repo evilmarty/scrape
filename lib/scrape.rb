@@ -1,7 +1,6 @@
 require "rubygems"
 require "logger"
 require "open-uri"
-require "bundler/setup"
 
 $: << File.dirname(__FILE__)
 
