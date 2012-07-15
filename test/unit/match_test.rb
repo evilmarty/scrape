@@ -14,12 +14,25 @@ class MatchTest < Scrape::TestCase
     assert ok, "Proc was not called"
   end
 
-  test "#invoke should pass the document to the proc" do
-    doc = "yay"
+  test "#invoke should pass 1 argument to proc" do
     ok = false
-    match = Scrape::Match.new("test"){|d| ok = (doc == d) }
-    match.invoke doc
-    assert ok, "Document was not passed into the proc"
+    match = Scrape::Match.new("test"){|one| ok = (one == "foo") }
+    match.invoke "foo"
+    assert ok, "Expected 1 argument to be passed"
+  end
+
+  test "#invoke should pass 2 arguments to proc" do
+    ok = false
+    match = Scrape::Match.new("test"){|one, two| ok = (one == "foo" && two == "bar") }
+    match.invoke "foo", "bar"
+    assert ok, "Expected 2 arguments to be passed"
+  end
+
+  test "#invoke should pass all arguments to proc" do
+    ok = false
+    match = Scrape::Match.new("test"){|*args| ok = (args == ["foo", "bar"]) }
+    match.invoke "foo", "bar"
+    assert ok, "Expected 2 arguments to be passed"
   end
 
   test "#=~ should return true when contains string" do

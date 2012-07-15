@@ -1,3 +1,3 @@
 module Scrape
-  VERSION = '0.2.1' unless defined? ::Scrape::VERSION
+  VERSION = '0.2.2' unless defined? ::Scrape::VERSION
 end

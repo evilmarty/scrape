@@ -3,11 +3,12 @@ class Scrape::Match
 
   def initialize matcher, &proc
     @matcher, @proc = matcher, proc
-    raise ArgumentError.new("Match block expects one argument") if proc.arity != 1
+    raise ArgumentError, "Not enough arguments in block" if proc.arity == 0
   end
 
-  def invoke doc
-    @proc.call doc
+  def invoke *args
+    args = args[0, @proc.arity] unless @proc.arity == -1
+    @proc.call *args
   end
 
   def =~ url

@@ -23,7 +23,7 @@ class Scrape::Site
     url = normalize url
     doc = Nokogiri::HTML Scrape.open(url)
 
-    @matches.each{|match| match.invoke doc if match =~ url }
+    @matches.each{|match| match.invoke doc, url if match =~ url }
 
     doc.css("a[href]").map{|node| normalize node['href'], url }.select{|url| accept? url }
   end
