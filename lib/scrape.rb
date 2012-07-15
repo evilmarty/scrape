@@ -6,7 +6,7 @@ require "bundler/setup"
 $: << File.dirname(__FILE__)
 
 require "scrape/version"
-require "scrape/version"
+require "scrape/string_ext"
 
 module Scrape
   autoload 'Application', 'scrape/application'
