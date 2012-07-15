@@ -1,5 +1,5 @@
 require "optparse"
-require "scrape"
+require File.expand_path("../../scrape", __FILE__)
 
 class Scrape::CLI
   attr_reader :command, :app, :options

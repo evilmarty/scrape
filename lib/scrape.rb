@@ -3,11 +3,12 @@ require "logger"
 require "open-uri"
 require "bundler/setup"
 
-require "scrape/string_ext.rb"
+$: << File.dirname(__FILE__)
+
+require "scrape/version"
+require "scrape/version"
 
 module Scrape
-  require 'scrape/version'
-
   autoload 'Application', 'scrape/application'
   autoload 'Site', 'scrape/site'
   autoload 'Match', 'scrape/match'
