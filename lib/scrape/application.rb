@@ -14,17 +14,20 @@ class Scrape::Application
     load_scrapefile
 
     while url = @queue.shift
-      Scrape.logger.info "Loading: #{url}..."
       @history << url
-      if site = self[url]
-        if urls = site.parse(url)
-          enqueue *urls
-          Scrape.logger.info "Found #{urls.length} urls."
+      begin
+        if site = self[url]
+          if urls = site.parse(url)
+            enqueue *urls
+            Scrape.logger.info "Parsed #{url}, found #{urls.length} urls."
+          else
+            Scrape.logger.info "Parsed #{url}."
+          end
         else
-          Scrape.logger.info "Done."
+          Scrape.logger.info "No rules defined for #{url}"
         end
-      else
-        Scrape.logger.info "Not defined."
+      rescue OpenURI::HTTPError => e
+        Scrape.logger.info "Error loading #{url}: #{e.message}"
       end
     end
   end
