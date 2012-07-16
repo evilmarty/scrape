@@ -5,7 +5,8 @@ require "open-uri"
 $: << File.dirname(__FILE__)
 
 require "scrape/version"
-require "scrape/string_ext"
+require "scrape/core_ext/array"
+require "scrape/core_ext/string"
 
 module Scrape
   autoload 'Application', 'scrape/application'
