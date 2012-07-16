@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require "scrape/cli"
+require File.expand_path("../../lib/scrape/cli", __FILE__)
 
 Scrape::CLI.new(File.basename($0), ARGV).run
