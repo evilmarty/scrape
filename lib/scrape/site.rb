@@ -2,15 +2,14 @@ require 'addressable/uri'
 require 'nokogiri'
 
 class Scrape::Site
-  attr_reader :url, :matches
-  attr_accessor :ignore_robots_txt
+  attr_reader :url, :matches, :options
 
   def initialize url, options = {}
     @url = Addressable::URI.parse url
     @url.query = nil
     @url.fragment = nil
+    @options = {:ignore_robots_txt => true}.merge options
     @matches = []
-    @ignore_robots_txt = options.fetch(:ignore_robots_txt){ true }
   end
 
   def add_match matcher, &proc
@@ -19,9 +18,15 @@ class Scrape::Site
     match
   end
 
+  def open url
+    headers = Hash.new
+    headers['Set-Cookie'] = options[:cookie].to_s if options.has_key? :cookie
+    Scrape.open url, headers
+  end
+
   def parse url
     url = normalize url
-    doc = Nokogiri::HTML Scrape.open(url)
+    doc = Nokogiri::HTML open(url)
 
     @matches.each{|match| match.invoke doc, url if match =~ url }
 
@@ -41,10 +46,6 @@ class Scrape::Site
     @robots_txt = Scrape::RobotsTxt.load url unless defined? @robots_txt
   end
 
-  def ignore_robots_txt?
-    !!@ignore_robots_txt
-  end
-
   def to_s
     url.to_s
   end
@@ -52,6 +53,6 @@ class Scrape::Site
 private
 
   def disallowed? url
-    !ignore_robots_txt? && robots_txt =~ Addressable::URI.parse(url).path
+    !options[:ignore_robots_txt] && robots_txt =~ Addressable::URI.parse(url).path
   end
 end

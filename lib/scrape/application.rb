@@ -1,13 +1,13 @@
 class Scrape::Application
-  attr_reader :scrapefile, :loader, :sites, :history, :ignore_robots_txt
+  attr_reader :scrapefile, :loader, :sites, :history, :options
 
   def initialize scrapefile, options = {}, loader = Scrape::DefaultLoader.new
     @scrapefile = File.expand_path scrapefile
     @loader = loader
+    @options = options
     @sites = {}
     @queue = []
     @history = []
-    @ignore_robots_txt = options.fetch(:ignore_robots_txt){ false }
   end
 
   def run
@@ -47,13 +47,17 @@ class Scrape::Application
     end
   end
 
-  def ignore_robots_txt= bool
-    sites.each{|_, site| site.ignore_robots_txt = bool }
-    @ignore_robots_txt = bool
-  end
-
   def [] url
     @sites.values.detect{|site| site.accept? url }
+  end
+
+  def add_site site, options = {}
+    case site
+    when String
+      site = Scrape::Site.new site, options
+      @sites.update site.to_s => site
+      site
+    end
   end
 
   def load_scrapefile
@@ -61,7 +65,6 @@ class Scrape::Application
     raise Scrape::FileNotFound.new(scrapefile) unless File.exists? scrapefile
     result = loader.load scrapefile
     @sites.update result if result.is_a? Hash
-    self.ignore_robots_txt = ignore_robots_txt
     reset
     @scrapefile_loaded = true
   end

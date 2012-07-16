@@ -7,6 +7,15 @@ class SiteTest < Scrape::TestCase
     assert_instance_of Scrape::Match, match
   end
 
+  test "#open should include cookie header when cookie option is set" do
+    stub_request(:get, "http://www.example.com/").
+      with(:headers => {'Set-Cookie'=>'omnom'}).
+      to_return(:status => 200, :body => "")
+
+    site = Scrape::Site.new "http://www.example.com", :cookie => "omnom"
+    site.open "http://www.example.com"
+  end
+
   test "#parse should return absolute urls that match the site's url" do
     stub_request(:get, "http://www.example.com/test").
       with(:headers => {"User-Agent" => Scrape.user_agent}).
