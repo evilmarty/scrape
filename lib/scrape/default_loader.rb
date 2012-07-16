@@ -1,19 +1,12 @@
 class Scrape::DefaultLoader
-  def load path
-    path = File.expand_path path
-    sites = {}
-
-    sandbox = Sandbox.new sites
-    sandbox.instance_eval File.read(path), path
-
-    sites
+  def initialize app
+    @app = app
   end
 
-  class Sandbox
-    include Scrape::DSL
-
-    def initialize sites
-      @sites = sites
-    end
+  def load path
+    path = File.expand_path path
+    File.exists? path or raise Scrape::FileNotFound, path
+    dsl = Scrape::DSL.new @app
+    dsl.instance_eval File.read(path), path
   end
 end

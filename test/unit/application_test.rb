@@ -53,6 +53,7 @@ class ApplicationTest < Scrape::TestCase
   test "#run should load the specified file" do
     filepath = File.join(SUPPORT_FILES, 'test1.scrape')
     test_loader = MiniTest::Mock.new
+    test_loader.expect :class, Scrape::DefaultLoader
     test_loader.expect :load, nil, [filepath]
     Scrape::Application.new(filepath, {}, test_loader).run
     assert test_loader.verify, "loader did not receive file"
@@ -70,12 +71,9 @@ class ApplicationTest < Scrape::TestCase
     assert_equal ["http://example.com"], app.queue
   end
 
-  test "#ignore_robots_txt should update #ignore_robots_txt on all sites" do
-    site = Scrape::Site.new "http://www.example.com", :ignore_robots_txt => false
+  test "#add_site should add the specied string to the collection" do
     app = Scrape::Application.new(".")
-    app.sites.update site.to_s => site
-    assert_equal false, site.ignore_robots_txt
-    app.ignore_robots_txt = true
-    assert_equal true, site.ignore_robots_txt
+    app.add_site "http://example.com"
+    assert app.sites.member?("http://example.com")
   end
 end
