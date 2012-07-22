@@ -15,4 +15,9 @@ class Scrape::DSL
     matches = @sites.map{|site| site.add_match matcher, &proc }
     matches.size == 1 ? matches.first : matches
   end
+
+  def enqueue *urls
+    @application.enqueue *urls
+  end
+  alias_method :queue, :enqueue
 end

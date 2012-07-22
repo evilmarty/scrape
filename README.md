@@ -13,6 +13,8 @@ end
 
 site "http://www.tumblr.com" # Can define multiple sites
 
+queue "http://www.tumblr.com/tagged" # Add specified urls to scrape
+
 match "/tagged" do |doc|
   # Do what ever we want with the document.
 end

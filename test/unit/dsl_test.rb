@@ -40,4 +40,11 @@ class DSLTest < Scrape::TestCase
       dsl.match("test"){|*args|}
     end
   end
+
+  test "#enqueue should add the specified urls to the queue" do
+    app = Scrape::Application.new(".")
+    dsl = Scrape::DSL.new app
+    dsl.enqueue "http://example.com"
+    assert_equal ["http://example.com"], app.queue
+  end
 end

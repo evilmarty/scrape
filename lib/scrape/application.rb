@@ -3,38 +3,35 @@ class Scrape::Application
 
   def initialize scrapefile, options = {}, loader = Scrape::DefaultLoader
     @scrapefile = File.expand_path scrapefile
-    @options = options
+    @options = options.dup
     @loader = loader.class == Class ? loader.new(self) : loader
     @sites = {}
-    @queue = []
-    @history = []
+    reset
   end
 
   def run
     load_scrapefile
 
+    @queue = sites.values.map{|site| site.to_s } if @queue.empty?
+
     while url = @queue.shift
       @history << url
-      begin
-        if site = self[url]
-          if urls = site.parse(url)
-            enqueue *urls
-            Scrape.logger.info "Parsed #{url}, found #{urls.length} urls."
-          else
-            Scrape.logger.info "Parsed #{url}."
-          end
+      if site = self[url]
+        if urls = site.parse(url)
+          enqueue *urls
+          Scrape.logger.info "Parsed #{url}, found #{urls.length} urls."
         else
-          Scrape.logger.info "No rules defined for #{url}"
+          Scrape.logger.info "Parsed #{url}."
         end
-      rescue OpenURI::HTTPError => e
-        Scrape.logger.info "Error loading #{url}: #{e.message}"
+      else
+        Scrape.logger.info "No rules defined for #{url}"
       end
     end
   end
 
   def reset
     @history = []
-    @queue = sites.values.map{|site| site.to_s }
+    @queue = []
   end
 
   def queue
@@ -54,7 +51,7 @@ class Scrape::Application
   def add_site site, options = {}
     case site
     when String
-      site = Scrape::Site.new site, options
+      site = Scrape::Site.new site, options.dup
       @sites.update site.to_s => site
       site
     end
@@ -63,7 +60,6 @@ class Scrape::Application
   def load_scrapefile
     return if @scrapefile_loaded
     loader.load(scrapefile)
-    reset
     @scrapefile_loaded = true
   end
 end
