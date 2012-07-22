@@ -8,6 +8,9 @@ Bundler.setup(:default, :test)
 
 require "scrape"
 
+# surpress log messages while we're testing
+Scrape.logger = Class.new{ def method_missing name, *args; end }.new
+
 class Scrape::TestCase < MiniTest::Unit::TestCase
   class << self
     def test name, &block

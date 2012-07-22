@@ -20,4 +20,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "nokogiri", "~> 1.5.5"
   s.add_development_dependency "addressable", "~> 2.2.8"
+  s.add_development_dependency "faraday", "~> 0.8.0"
+  s.add_development_dependency "faraday_middleware", "~> 0.8.8"
 end

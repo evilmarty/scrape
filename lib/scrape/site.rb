@@ -20,7 +20,7 @@ class Scrape::Site
 
   def open url
     headers = Hash.new
-    headers['Set-Cookie'] = options[:cookie].to_s if options.has_key? :cookie
+    headers[:cookie] = cookie if options[:cookie]
     Scrape.open url, headers
   end
 
@@ -31,6 +31,9 @@ class Scrape::Site
     @matches.each{|match| match.invoke doc, url if match =~ url }
 
     doc.css("a[href]").map{|node| normalize node['href'], url }.select{|url| accept? url }
+  rescue Scrape::HTTPError => e
+    Scrape.logger.info "Error loading #{url}: #{e.message}"
+    nil
   end
 
   def accept? url
@@ -54,5 +57,19 @@ private
 
   def disallowed? url
     !options[:ignore_robots_txt] && robots_txt =~ Addressable::URI.parse(url).path
+  end
+
+  def cookie
+    cookie = options[:cookie]
+    case cookie
+    when Hash
+      cookie.map{|name, val| "#{encode(name)}=#{encode(val)}" }.join("; ")
+    when String
+      cookie
+    end
+  end
+
+  def encode str
+    str.to_s.gsub(" ", "%20").gsub(",", "%2C").gsub(";", "%3B")
   end
 end

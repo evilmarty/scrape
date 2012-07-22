@@ -9,10 +9,19 @@ class SiteTest < Scrape::TestCase
 
   test "#open should include cookie header when cookie option is set" do
     stub_request(:get, "http://www.example.com/").
-      with(:headers => {'Set-Cookie'=>'omnom'}).
+      with(:headers => {'Cookie' => 'omnom'}).
       to_return(:status => 200, :body => "")
 
     site = Scrape::Site.new "http://www.example.com", :cookie => "omnom"
+    site.open "http://www.example.com"
+  end
+
+  test "#open should include cookie header when cookie option is a hash" do
+    stub_request(:get, "http://www.example.com/").
+      with(:headers => {'Cookie' => 'foo=bar'}).
+      to_return(:status => 200, :body => "")
+
+    site = Scrape::Site.new "http://www.example.com", :cookie => {:foo => "bar"}
     site.open "http://www.example.com"
   end
 

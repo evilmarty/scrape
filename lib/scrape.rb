@@ -1,6 +1,8 @@
 require "rubygems"
 require "logger"
-require "open-uri"
+require "addressable/uri"
+require "faraday"
+require "faraday_middleware"
 
 $: << File.dirname(__FILE__)
 
@@ -18,6 +20,7 @@ module Scrape
   autoload 'RobotsTxtRules', 'scrape/robots_txt_rules'
 
   class FileNotFound < Exception; end
+  class HTTPError < StandardError; end
 
   class << self
     attr_writer :user_agent
@@ -38,9 +41,26 @@ module Scrape
       Application.new path
     end
 
-    def open url, headers = {}, &block
-      headers = {"User-Agent" => user_agent}.merge(headers)
-      super(url, headers, &block).read
+    def open url, headers = nil, &block
+      url = Addressable::URI.parse url
+      headers ||= {}
+
+      conn = Faraday.new :url => url.to_s do |faraday|
+        faraday.response :follow_redirects, :cookies => :all, :limit => 3
+        faraday.adapter Faraday.default_adapter
+      end
+
+      conn.headers[:user_agent] = user_agent
+
+      res = conn.get url.request_uri do |req|
+        headers.each{|key, val| req[key] = val }
+      end
+
+      if res.success?
+        res.body
+      else
+        raise HTTPError, res.status
+      end
     end
   end
 end

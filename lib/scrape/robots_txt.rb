@@ -29,6 +29,7 @@ class Scrape::RobotsTxt
   end
 
   def self.parse content
+    return if content.nil?
     rules, user_agent = Hash.new, nil
 
     content.split("\n").each do |line|
@@ -49,7 +50,8 @@ class Scrape::RobotsTxt
   def self.load url, default = true
     url = Addressable::URI.join(url, "/robots.txt") if default
     parse Scrape.open(url)
-  rescue OpenURI::HTTPError
+  rescue Scrape::HTTPError
+    Scrape.logger.warn "Failed to obtain robots.txt: #{url}"
     nil
   end
   public :load
